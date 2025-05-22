@@ -91,6 +91,7 @@ func NewEVMTxContext(msg *Message) vm.TxContext {
 	if msg.BlobGasFeeCap != nil {
 		ctx.BlobFeeCap = new(big.Int).Set(msg.BlobGasFeeCap)
 	}
+	ctx.TxHash = msg.TxHash
 	return ctx
 }
 

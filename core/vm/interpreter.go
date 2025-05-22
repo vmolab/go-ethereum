@@ -245,6 +245,29 @@ func (in *EVMInterpreter) Run(contract *Contract, input []byte, readOnly bool) (
 		op = contract.GetOp(pc)
 		operation := in.table[op]
 		cost = operation.constantGas // For tracing
+
+		// ==---- BEGIN MOD ----== //
+		// Search function call
+		if op == CALL || op == CALLCODE || op == DELEGATECALL || op == STATICCALL {
+			callerBlockNumber := in.evm.Context.BlockNumber
+			callerAddr := contract.Caller()
+			calleeAddr := common.BigToAddress(stack.Back(1).ToBig())
+			// pull the real code‐hash from the StateDB
+			calleeCodeHash := in.evm.StateDB.GetCodeHash(calleeAddr)
+
+			fmt.Printf("IN (Addr:%s,Opcode:%x,TxHash:%s,BlockNo:%v)->(Addr:%s,Input:%x,CodeHash:%s)\n",
+				callerAddr.Hex(), byte(op), in.evm.TxContext.TxHash.Hex(),
+				callerBlockNumber, calleeAddr.Hex(), input, calleeCodeHash)
+		}
+		// ==---- END MOD ----== //
+
+		// ==---- BEGIN MOD ----== //
+		// Search deployment
+		if op == CREATE || op == CREATE2 {
+			// TODO
+		}
+		// ==---- END MOD ----== //
+
 		// Validate stack
 		if sLen := stack.len(); sLen < operation.minStack {
 			return nil, &ErrStackUnderflow{stackLen: sLen, required: operation.minStack}

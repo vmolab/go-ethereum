@@ -45,6 +45,11 @@ func newStatePrefetcher(config *params.ChainConfig, chain *HeaderChain) *statePr
 // the transaction messages using the statedb, but any changes are discarded. The
 // only goal is to pre-cache transaction signatures and state trie nodes.
 func (p *statePrefetcher) Prefetch(block *types.Block, statedb *state.StateDB, cfg vm.Config, interrupt *atomic.Bool) {
+	// ==---- BEGIN MOD ----== //
+	// Disable prefetch for correct measure
+	return
+	// ==---- END MOD ----== //
+
 	var (
 		header       = block.Header()
 		gaspool      = new(GasPool).AddGas(block.GasLimit())

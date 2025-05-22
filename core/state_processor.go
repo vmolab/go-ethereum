@@ -145,6 +145,11 @@ func ApplyTransactionWithEVM(msg *Message, gp *GasPool, statedb *state.StateDB, 
 			defer func() { hooks.OnTxEnd(receipt, err) }()
 		}
 	}
+	// ==---- BEGIN MOD ----== //
+	// Pass TxHash through `msg`. It will be passed to the `TxContext` at `ApplyMessage`
+	// and `NewEVMTxContext`
+	msg.TxHash = tx.Hash()
+	// ==---- END MOD ----== //
 	// Apply the transaction to the current state (included in the env).
 	result, err := ApplyMessage(evm, msg, gp)
 	if err != nil {

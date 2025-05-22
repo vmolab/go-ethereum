@@ -18,6 +18,7 @@ package vm
 
 import (
 	"errors"
+	"fmt"
 	"math/big"
 	"sync/atomic"
 
@@ -76,6 +77,10 @@ type TxContext struct {
 	BlobHashes   []common.Hash       // Provides information for BLOBHASH
 	BlobFeeCap   *big.Int            // Is used to zero the blobbasefee if NoBaseFee is set
 	AccessEvents *state.AccessEvents // Capture all state accesses for this tx
+
+	// ==---- BEGIN MOD ----== //
+	TxHash common.Hash
+	// ==---- END MOD ----== //
 }
 
 // EVM is the Ethereum Virtual Machine base object and provides
@@ -223,6 +228,12 @@ func (evm *EVM) Call(caller common.Address, addr common.Address, input []byte, g
 	}
 	evm.Context.Transfer(evm.StateDB, caller, addr, value)
 
+	// ==---- BEGIN MOD ----== //
+	fmt.Printf("EX (Addr:%s,Opcode:%x,TxHash:%s,BlockNo:%v)->(Addr:%s,Input:%x,CodeHash:%s)\n",
+		caller.Hex(), byte(CALL), evm.TxContext.TxHash.Hex(),
+		evm.Context.BlockNumber, addr.Hex(), input, evm.StateDB.GetCodeHash(addr))
+	// ==---- END MOD ----== //
+
 	if isPrecompile {
 		ret, gas, err = RunPrecompiledContract(p, input, gas, evm.Config.Tracer)
 	} else {
@@ -255,6 +266,7 @@ func (evm *EVM) Call(caller common.Address, addr common.Address, input []byte, g
 		//} else {
 		//	evm.StateDB.DiscardSnapshot(snapshot)
 	}
+
 	return ret, gas, err
 }
 
@@ -286,6 +298,12 @@ func (evm *EVM) CallCode(caller common.Address, addr common.Address, input []byt
 	}
 	var snapshot = evm.StateDB.Snapshot()
 
+	// ==---- BEGIN MOD ----== //
+	fmt.Printf("EX (Addr:%s,Opcode:%x,TxHash:%s,BlockNo:%v)->(Addr:%s,Input:%x,CodeHash:%s)\n",
+		caller.Hex(), byte(CALLCODE), evm.TxContext.TxHash.Hex(),
+		evm.Context.BlockNumber, addr.Hex(), input, evm.StateDB.GetCodeHash(addr))
+	// ==---- END MOD ----== //
+
 	// It is allowed to call precompiles, even via delegatecall
 	if p, isPrecompile := evm.precompile(addr); isPrecompile {
 		ret, gas, err = RunPrecompiledContract(p, input, gas, evm.Config.Tracer)
@@ -306,6 +324,7 @@ func (evm *EVM) CallCode(caller common.Address, addr common.Address, input []byt
 			gas = 0
 		}
 	}
+
 	return ret, gas, err
 }
 
@@ -329,6 +348,12 @@ func (evm *EVM) DelegateCall(originCaller common.Address, caller common.Address,
 	}
 	var snapshot = evm.StateDB.Snapshot()
 
+	// ==---- BEGIN MOD ----== //
+	fmt.Printf("EX (Addr:%s,Opcode:%x,TxHash:%s,BlockNo:%v)->(Addr:%s,Input:%x,CodeHash:%s)\n",
+		caller.Hex(), byte(DELEGATECALL), evm.TxContext.TxHash.Hex(),
+		evm.Context.BlockNumber, addr.Hex(), input, evm.StateDB.GetCodeHash(addr))
+	// ==---- END MOD ----== //
+
 	// It is allowed to call precompiles, even via delegatecall
 	if p, isPrecompile := evm.precompile(addr); isPrecompile {
 		ret, gas, err = RunPrecompiledContract(p, input, gas, evm.Config.Tracer)
@@ -350,6 +375,7 @@ func (evm *EVM) DelegateCall(originCaller common.Address, caller common.Address,
 			gas = 0
 		}
 	}
+
 	return ret, gas, err
 }
 
@@ -375,6 +401,12 @@ func (evm *EVM) StaticCall(caller common.Address, addr common.Address, input []b
 	// then certain tests start failing; stRevertTest/RevertPrecompiledTouchExactOOG.json.
 	// We could change this, but for now it's left for legacy reasons
 	var snapshot = evm.StateDB.Snapshot()
+
+	// ==---- BEGIN MOD ----== //
+	fmt.Printf("EX (Addr:%s,Opcode:%x,TxHash:%s,BlockNo:%v)->(Addr:%s,Input:%x,CodeHash:%s)\n",
+		caller.Hex(), byte(STATICCALL), evm.TxContext.TxHash.Hex(),
+		evm.Context.BlockNumber, addr.Hex(), input, evm.StateDB.GetCodeHash(addr))
+	// ==---- END MOD ----== //
 
 	// We do an AddBalance of zero here, just in order to trigger a touch.
 	// This doesn't matter on Mainnet, where all empties are gone at the time of Byzantium,
@@ -406,6 +438,7 @@ func (evm *EVM) StaticCall(caller common.Address, addr common.Address, input []b
 			gas = 0
 		}
 	}
+
 	return ret, gas, err
 }
 

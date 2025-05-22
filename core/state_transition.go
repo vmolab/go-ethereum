@@ -164,6 +164,10 @@ type Message struct {
 
 	// When SkipFromEOACheck is true, the message sender is not checked to be an EOA.
 	SkipFromEOACheck bool
+
+	// ==---- BEGIN MOD ----== //
+	TxHash common.Hash
+	// ==---- END MOD ----== //
 }
 
 // TransactionToMessage converts a transaction into a Message.
