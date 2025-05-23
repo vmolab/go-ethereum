@@ -19,6 +19,7 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"os"
 	"slices"
 	"sort"
@@ -44,6 +45,8 @@ import (
 
 	"github.com/urfave/cli/v2"
 )
+
+var callLogger io.Writer
 
 const (
 	clientIdentifier = "geth" // Client identifier to advertise over the network
