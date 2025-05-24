@@ -8,10 +8,12 @@ import (
 
 var CallLogger io.Writer
 
+// var IsFirstExternalCall bool = true
+
 func init() {
 	CallLogger = &lumberjack.Logger{
-		Filename: "evm_calls.log",
-		MaxSize:  8, // megabytes
-		Compress: false,
+		Filename: "log/evm_calls.log",
+		MaxSize:  512, // megabytes
+		Compress: true,
 	}
 }

@@ -233,15 +233,14 @@ func (evm *EVM) Call(caller common.Address, addr common.Address, input []byte, g
 	var calleeIsNilCode string
 
 	if calleeCodeHash == crypto.Keccak256Hash(nil) {
-		calleeIsNilCode = "NIL"
+		calleeIsNilCode = "N"
 	} else {
-		calleeIsNilCode = "OK"
+		calleeIsNilCode = "O"
 	}
 
-	fmt.Fprintf(common.CallLogger, "E(Addr:%s,Opcode:%x,TxHash:%s,BlockNo:%v)->(Addr:%s,Input:%x,CodeHash:%s:%s,CodeSize:%v)\n",
-		caller.Hex(), byte(CALL), evm.TxContext.TxHash.Hex(),
-		evm.Context.BlockNumber, addr.Hex(), input,
-		calleeCodeHash, calleeIsNilCode, evm.StateDB.GetCodeSize(addr))
+	fmt.Fprintf(common.CallLogger, "(Addr:%s,Opcode:%x,TxHash:%s,BlockNo:%v)->(Addr:%s,Input:%x,CodeHash:%s:%s,CodeSize:%v)\n",
+		caller.Hex(), byte(CALL), evm.TxContext.TxHash.Hex(), evm.Context.BlockNumber,
+		addr.Hex(), input, calleeIsNilCode, calleeCodeHash, evm.StateDB.GetCodeSize(addr))
 	// ==---- END MOD ----== //
 
 	if isPrecompile {
@@ -318,10 +317,9 @@ func (evm *EVM) CallCode(caller common.Address, addr common.Address, input []byt
 		calleeIsNilCode = "OK"
 	}
 
-	fmt.Fprintf(common.CallLogger, "E(Addr:%s,Opcode:%x,TxHash:%s,BlockNo:%v)->(Addr:%s,Input:%x,CodeHash:%s:%s,CodeSize:%v)\n",
-		caller.Hex(), byte(CALLCODE), evm.TxContext.TxHash.Hex(),
-		evm.Context.BlockNumber, addr.Hex(), input,
-		calleeCodeHash, calleeIsNilCode, evm.StateDB.GetCodeSize(addr))
+	fmt.Fprintf(common.CallLogger, "(Addr:%s,Opcode:%x,TxHash:%s,BlockNo:%v)->(Addr:%s,Input:%x,CodeHash:%s:%s,CodeSize:%v)\n",
+		caller.Hex(), byte(CALLCODE), evm.TxContext.TxHash.Hex(), evm.Context.BlockNumber,
+		addr.Hex(), input, calleeIsNilCode, calleeCodeHash, evm.StateDB.GetCodeSize(addr))
 	// ==---- END MOD ----== //
 
 	// It is allowed to call precompiles, even via delegatecall
@@ -378,10 +376,9 @@ func (evm *EVM) DelegateCall(originCaller common.Address, caller common.Address,
 		calleeIsNilCode = "OK"
 	}
 
-	fmt.Fprintf(common.CallLogger, "E(Addr:%s,Opcode:%x,TxHash:%s,BlockNo:%v)->(Addr:%s,Input:%x,CodeHash:%s:%s,CodeSize:%v)\n",
-		caller.Hex(), byte(DELEGATECALL), evm.TxContext.TxHash.Hex(),
-		evm.Context.BlockNumber, addr.Hex(), input,
-		calleeCodeHash, calleeIsNilCode, evm.StateDB.GetCodeSize(addr))
+	fmt.Fprintf(common.CallLogger, "(Addr:%s,Opcode:%x,TxHash:%s,BlockNo:%v)->(Addr:%s,Input:%x,CodeHash:%s:%s,CodeSize:%v)\n",
+		caller.Hex(), byte(DELEGATECALL), evm.TxContext.TxHash.Hex(), evm.Context.BlockNumber,
+		addr.Hex(), input, calleeIsNilCode, calleeCodeHash, evm.StateDB.GetCodeSize(addr))
 	// ==---- END MOD ----== //
 
 	// It is allowed to call precompiles, even via delegatecall
@@ -442,10 +439,9 @@ func (evm *EVM) StaticCall(caller common.Address, addr common.Address, input []b
 		calleeIsNilCode = "OK"
 	}
 
-	fmt.Fprintf(common.CallLogger, "E(Addr:%s,Opcode:%x,TxHash:%s,BlockNo:%v)->(Addr:%s,Input:%x,CodeHash:%s:%s,CodeSize:%v)\n",
-		caller.Hex(), byte(STATICCALL), evm.TxContext.TxHash.Hex(),
-		evm.Context.BlockNumber, addr.Hex(), input,
-		calleeCodeHash, calleeIsNilCode, evm.StateDB.GetCodeSize(addr))
+	fmt.Fprintf(common.CallLogger, "(Addr:%s,Opcode:%x,TxHash:%s,BlockNo:%v)->(Addr:%s,Input:%x,CodeHash:%s:%s,CodeSize:%v)\n",
+		caller.Hex(), byte(STATICCALL), evm.TxContext.TxHash.Hex(), evm.Context.BlockNumber,
+		addr.Hex(), input, calleeIsNilCode, calleeCodeHash, evm.StateDB.GetCodeSize(addr))
 	// ==---- END MOD ----== //
 
 	// We do an AddBalance of zero here, just in order to trigger a touch.

@@ -18,7 +18,6 @@ package vm
 
 import (
 	"fmt"
-	"math/big"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/math"
@@ -226,7 +225,7 @@ func (in *EVMInterpreter) Run(contract *Contract, input []byte, readOnly bool) (
 	}
 
 	// ==---- BEGIN MOD ----== //
-	var nilHash common.Hash = crypto.Keccak256Hash(nil)
+	// var nilHash common.Hash = crypto.Keccak256Hash(nil)
 	// ==---- END MOD ----== //
 
 	// The Interpreter main run loop (contextual). This loop runs until either an
@@ -298,57 +297,6 @@ func (in *EVMInterpreter) Run(contract *Contract, input []byte, readOnly bool) (
 				contract.Gas -= dynamicCost
 			}
 		}
-
-		// ==---- BEGIN MOD ----== //
-		// Search function call
-		if op == CALL || op == CALLCODE || op == DELEGATECALL || op == STATICCALL {
-			callerBlockNumber := in.evm.Context.BlockNumber
-			callerAddr := contract.Caller()
-
-			calleeAddr := common.BigToAddress(stack.Back(1).ToBig()) // FIXME: panic: runtime error: index out of range [-2]
-			// pull the real code‐hash from the StateDB
-			calleeCodeHash := in.evm.StateDB.GetCodeHash(calleeAddr)
-			calleeCodeSize := in.evm.StateDB.GetCodeSize(calleeAddr)
-
-			var calleeIsNilCode string
-
-			if calleeCodeHash == nilHash {
-				calleeIsNilCode = "NIL"
-			} else {
-				calleeIsNilCode = "OK"
-			}
-
-			var argsOffset, argsSize *big.Int
-
-			if op == CALL || op == CALLCODE {
-				argsOffset = stack.Back(3).ToBig()
-				argsSize = stack.Back(4).ToBig()
-			} else {
-				argsOffset = stack.Back(2).ToBig()
-				argsSize = stack.Back(3).ToBig()
-			}
-
-			memBytes := mem.Data()
-			end := new(big.Int).Add(argsOffset, argsSize)
-
-			if end.Uint64() > uint64(len(memBytes)) {
-				end.SetUint64(uint64(len(memBytes)))
-			}
-
-			calldata := memBytes[argsOffset.Int64():end.Int64()]
-
-			fmt.Fprintf(common.CallLogger, "I(Addr:%s,Opcode:%x,TxHash:%s,BlockNo:%v)->(Addr:%s,Input:%x,CodeHash:%s:%s,CodeSize:%v)\n",
-				callerAddr.Hex(), byte(op), in.evm.TxContext.TxHash.Hex(),
-				callerBlockNumber, calleeAddr.Hex(), calldata, calleeCodeHash, calleeIsNilCode, calleeCodeSize)
-		}
-		// ==---- END MOD ----== //
-
-		// ==---- BEGIN MOD ----== //
-		// Search deployment
-		if op == CREATE || op == CREATE2 {
-		}
-		// ==---- END MOD ----== //
-
 		// Do tracing before potential memory expansion
 		if debug {
 			if in.evm.Config.Tracer.OnGasChange != nil {
@@ -362,6 +310,43 @@ func (in *EVMInterpreter) Run(contract *Contract, input []byte, readOnly bool) (
 		if memorySize > 0 {
 			mem.Resize(memorySize)
 		}
+
+		// ==---- BEGIN MOD ----== //
+		// // Search function call
+		// if op == CALL || op == CALLCODE || op == DELEGATECALL || op == STATICCALL {
+		// 	callerBlockNumber := in.evm.Context.BlockNumber
+		// 	callerAddr := contract.Address()
+
+		// 	calleeAddr := common.BigToAddress(stack.Back(1).ToBig())
+		// 	// pull the real code‐hash from the StateDB
+		// 	calleeCodeHash := in.evm.StateDB.GetCodeHash(calleeAddr)
+		// 	calleeCodeSize := in.evm.StateDB.GetCodeSize(calleeAddr)
+
+		// 	var calleeIsNilCode string
+
+		// 	if calleeCodeHash == nilHash {
+		// 		calleeIsNilCode = "NIL"
+		// 	} else {
+		// 		calleeIsNilCode = "OK"
+		// 	}
+
+		// 	var argsOffset, argsSize *big.Int
+
+		// 	if op == CALL || op == CALLCODE {
+		// 		argsOffset = stack.Back(3).ToBig()
+		// 		argsSize = stack.Back(4).ToBig()
+		// 	} else {
+		// 		argsOffset = stack.Back(2).ToBig()
+		// 		argsSize = stack.Back(3).ToBig()
+		// 	}
+
+		// 	calldata := mem.GetCopy(argsOffset.Uint64(), argsSize.Uint64())
+
+		// 	fmt.Fprintf(common.CallLogger, "I(Addr:%s,Opcode:%x,TxHash:%s,BlockNo:%v)->(Addr:%s,Input:%x,CodeHash:%s:%s,CodeSize:%v)\n",
+		// 		callerAddr.Hex(), byte(op), in.evm.TxContext.TxHash.Hex(), callerBlockNumber,
+		// 		calleeAddr.Hex(), calldata, calleeIsNilCode, calleeCodeHash, calleeCodeSize)
+		// }
+		// ==---- END MOD ----== //
 
 		// execute the operation
 		res, err = operation.execute(&pc, in, callContext)
