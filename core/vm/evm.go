@@ -315,9 +315,9 @@ func (evm *EVM) CallCode(caller common.Address, addr common.Address, input []byt
 		var calleeIsNilCode string
 
 		if calleeCodeHash == crypto.Keccak256Hash(nil) {
-			calleeIsNilCode = "NIL"
+			calleeIsNilCode = "N"
 		} else {
-			calleeIsNilCode = "OK"
+			calleeIsNilCode = "O"
 		}
 
 		fmt.Fprintf(common.CallLogger, "%s,%x,%s,%v|%s,%x,%s:%s,%v\n",
@@ -376,9 +376,9 @@ func (evm *EVM) DelegateCall(originCaller common.Address, caller common.Address,
 		var calleeIsNilCode string
 
 		if calleeCodeHash == crypto.Keccak256Hash(nil) {
-			calleeIsNilCode = "NIL"
+			calleeIsNilCode = "N"
 		} else {
-			calleeIsNilCode = "OK"
+			calleeIsNilCode = "O"
 		}
 
 		fmt.Fprintf(common.CallLogger, "%s,%x,%s,%v|%s,%x,%s:%s,%v\n",
@@ -441,9 +441,9 @@ func (evm *EVM) StaticCall(caller common.Address, addr common.Address, input []b
 		var calleeIsNilCode string
 
 		if calleeCodeHash == crypto.Keccak256Hash(nil) {
-			calleeIsNilCode = "NIL"
+			calleeIsNilCode = "N"
 		} else {
-			calleeIsNilCode = "OK"
+			calleeIsNilCode = "O"
 		}
 
 		fmt.Fprintf(common.CallLogger, "%s,%x,%s,%v|%s,%x,%s:%s,%v\n",

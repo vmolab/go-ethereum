@@ -8,7 +8,7 @@ import (
 
 var CallLogger io.Writer
 
-const DoCallLog bool = false
+const DoCallLog bool = true
 
 func init() {
 	CallLogger = &lumberjack.Logger{
