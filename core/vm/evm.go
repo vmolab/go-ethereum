@@ -279,10 +279,10 @@ func (evm *EVM) Call(caller common.Address, addr common.Address, input []byte, g
 		//	evm.StateDB.DiscardSnapshot(snapshot)
 	}
 
-	// ==---- BEGIN MOD ----== //\
+	// ==---- BEGIN MOD ----== //
 	if common.DoCallLog {
-		gasAfter := leftOverGas
-		gasUsed := gasBefore - gasAfter
+		gasAfter := gas // 현재 남은 가스
+		gasUsed := gasAfter - gasBefore
 		var calleeCodeHash common.Hash = evm.StateDB.GetCodeHash(addr)
 		var calleeIsNilCode string
 
@@ -293,7 +293,7 @@ func (evm *EVM) Call(caller common.Address, addr common.Address, input []byte, g
 		}
 
 		fmt.Fprintf(common.CallLogger, "%s,%x,%s,%v|%s,%x,%s:%s,%v,%v\n",
-			caller.Hex(), byte(DELEGATECALL), evm.TxContext.TxHash.Hex(), evm.Context.BlockNumber,
+			caller.Hex(), byte(CALL), evm.TxContext.TxHash.Hex(), evm.Context.BlockNumber,
 			addr.Hex(), input, calleeIsNilCode, calleeCodeHash, evm.StateDB.GetCodeSize(addr), gasUsed)
 	}
 	// ==---- END MOD ----== //
@@ -367,10 +367,10 @@ func (evm *EVM) CallCode(caller common.Address, addr common.Address, input []byt
 		}
 	}
 
-	// ==---- BEGIN MOD ----== //\
+	// ==---- BEGIN MOD ----== //
 	if common.DoCallLog {
-		gasAfter := leftOverGas
-		gasUsed := gasBefore - gasAfter
+		gasAfter := gas // 현재 남은 가스
+		gasUsed := gasAfter - gasBefore
 		var calleeCodeHash common.Hash = evm.StateDB.GetCodeHash(addr)
 		var calleeIsNilCode string
 
@@ -381,7 +381,7 @@ func (evm *EVM) CallCode(caller common.Address, addr common.Address, input []byt
 		}
 
 		fmt.Fprintf(common.CallLogger, "%s,%x,%s,%v|%s,%x,%s:%s,%v,%v\n",
-			caller.Hex(), byte(DELEGATECALL), evm.TxContext.TxHash.Hex(), evm.Context.BlockNumber,
+			caller.Hex(), byte(CALLCODE), evm.TxContext.TxHash.Hex(), evm.Context.BlockNumber,
 			addr.Hex(), input, calleeIsNilCode, calleeCodeHash, evm.StateDB.GetCodeSize(addr), gasUsed)
 	}
 	// ==---- END MOD ----== //
@@ -448,10 +448,10 @@ func (evm *EVM) DelegateCall(originCaller common.Address, caller common.Address,
 		}
 	}
 
-	// ==---- BEGIN MOD ----== //\
+	// ==---- BEGIN MOD ----== //
 	if common.DoCallLog {
-		gasAfter := leftOverGas
-		gasUsed := gasBefore - gasAfter
+		gasAfter := gas // 현재 남은 가스
+		gasUsed := gasAfter - gasBefore
 		var calleeCodeHash common.Hash = evm.StateDB.GetCodeHash(addr)
 		var calleeIsNilCode string
 
@@ -544,8 +544,8 @@ func (evm *EVM) StaticCall(caller common.Address, addr common.Address, input []b
 
 	// ==---- BEGIN MOD ----== //\
 	if common.DoCallLog {
-		gasAfter := leftOverGas
-		gasUsed := gasBefore - gasAfter
+		gasAfter := gas // 현재 남은 가스
+		gasUsed := gasAfter - gasBefore
 		var calleeCodeHash common.Hash = evm.StateDB.GetCodeHash(addr)
 		var calleeIsNilCode string
 
@@ -556,7 +556,7 @@ func (evm *EVM) StaticCall(caller common.Address, addr common.Address, input []b
 		}
 
 		fmt.Fprintf(common.CallLogger, "%s,%x,%s,%v|%s,%x,%s:%s,%v,%v\n",
-			caller.Hex(), byte(DELEGATECALL), evm.TxContext.TxHash.Hex(), evm.Context.BlockNumber,
+			caller.Hex(), byte(STATICCALL), evm.TxContext.TxHash.Hex(), evm.Context.BlockNumber,
 			addr.Hex(), input, calleeIsNilCode, calleeCodeHash, evm.StateDB.GetCodeSize(addr), gasUsed)
 	}
 	// ==---- END MOD ----== //
